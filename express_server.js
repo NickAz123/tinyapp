@@ -1,3 +1,4 @@
+//Server Dependencies, Imports and Global Variables
 const express = require("express");
 const app = express();
 const PORT = 8080;
@@ -10,13 +11,20 @@ const urlDatabase = {
   "dhWui4": "http://www.bing.com"
 };
 
+//Server Pages
+app.get("/", (req, res) => {
+  res.send("Hello!");
+});
+
 app.get('/urls', (req, res) => {
   const dataVars = {urls: urlDatabase};
   res.render("urls_index", dataVars);
 });
 
-app.get("/", (req, res) => {
-  res.send("Hello!");
+app.get('/urls/:shortURL', (req, res) => {
+  const dataVars = {shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]};
+  console.log(req.params);
+  res.render("urls_show", dataVars);
 });
 
 app.listen(PORT, () => {
