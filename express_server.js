@@ -2,6 +2,8 @@
 const express = require("express");
 const app = express();
 const PORT = 8080;
+const bodyParser = require("body-parser");
+app.use(bodyParser.urlencoded({extended: true}));
 
 app.set('view engine', 'ejs');
 
@@ -11,25 +13,40 @@ const urlDatabase = {
   "dhWui4": "http://www.bing.com"
 };
 
+//Server Requests
+app.post('/urls', (req, res) => {
+  let newData = req.body;
+  const shortURL = generateRandomString();
+  urlDatabase[shortURL] = newData.longURL;
+
+  res.redirect(301, '/urls');
+  res.end();
+});
+
 //Server Pages
-app.get("/", (req, res) => {
-  res.send("Hello!");
+app.get('/', (req, res) => {
+  res.send('Hello!');
 });
 
 app.get('/urls', (req, res) => {
   const dataVars = {urls: urlDatabase};
-  res.render("urls_index", dataVars);
+  res.render('urls_index', dataVars);
 });
 
 app.get('/urls/new', (req, res) => {
-  res.render("urls_new");
+  res.render('urls_new');
 });
 
 app.get('/urls/:shortURL', (req, res) => {
   const dataVars = {shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]};
-  res.render("urls_show", dataVars);
+  // res.redirect(dataVars.longURL);
+  res.render('urls_show', dataVars);
 });
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
+const generateRandomString = (length = 6) => {
+  return Math.random().toString(20).substr(2, length);
+};
