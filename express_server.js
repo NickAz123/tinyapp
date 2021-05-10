@@ -30,6 +30,13 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   res.end();
 });
 
+app.post('/urls/:shortURL/edit', (req, res) => {
+  console.log("reach");
+  let shortURL = req.params.shortURL;
+  res.redirect(`/urls/${shortURL}`);
+  res.end();
+});
+
 //SERVER PAGES
 app.get('/', (req, res) => {
   res.send('Hello!');
