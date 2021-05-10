@@ -1,4 +1,4 @@
-//Server Dependencies, Imports and Global Variables
+//SERVER DEPENDENCIES & VARIABLES
 const express = require("express");
 const app = express();
 const PORT = 8080;
@@ -13,7 +13,7 @@ const urlDatabase = {
   "dhWui4": "http://www.bing.com"
 };
 
-//Server Requests
+//SERVER REQUESTS
 app.post('/urls', (req, res) => {
   let newData = req.body;
   const shortURL = generateRandomString();
@@ -23,7 +23,14 @@ app.post('/urls', (req, res) => {
   res.end();
 });
 
-//Server Pages
+app.post('/urls/:shortURL/delete', (req, res) => {
+  let shortURL = req.params.shortURL;
+  delete urlDatabase[shortURL];
+  res.redirect(301, '/urls');
+  res.end();
+});
+
+//SERVER PAGES
 app.get('/', (req, res) => {
   res.send('Hello!');
 });
