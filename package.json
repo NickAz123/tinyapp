@@ -16,5 +16,9 @@
   "bugs": {
     "url": "https://github.com/NickAz123/tinyapp/issues"
   },
-  "homepage": "https://github.com/NickAz123/tinyapp#readme"
+  "homepage": "https://github.com/NickAz123/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "morgan": "^1.10.0"
+  }
 }
