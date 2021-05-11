@@ -47,7 +47,10 @@ app.post('/urls/:shortURL/edit', (req, res) => {
 
 app.post('/login', (req, res) => {
   const user = req.body.username;
-  res.cookie('username', user);
+  const password = req.body.password;
+  const id = findIDByName(user, password);
+
+  res.cookie('user_id', id);
   res.redirect(301, `/urls`);
   res.end();
 });
@@ -110,3 +113,13 @@ const findUserByID = (currentID) => {
   }
   return empty;
 };
+
+const findIDByName = (user, password) => {
+  for (let name in users) {
+    if (name === user) {
+      if (users[name].password === password) {
+        return users[name].id;
+      }
+    }
+  }
+}
