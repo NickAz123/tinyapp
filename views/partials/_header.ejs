@@ -13,15 +13,20 @@
     </div>
     <div>
       <%if (!email) {%>
-          <div class="navbar-item nav-link" style="display: inline"><a style="color: inherit;" href="/login"><b>Login</b></a></div>
-          <div class="navbar-item nav-link" style="display: inline"><a style="color: inherit;" href="/register"><b>Register</b></a></div>
-      <%}%>
-      <%if (email) {%>
-        <form method="POST" action="/logout">
-          <div style="display: inline">Currently Logged In As: <%= email %></div>
-          <button style="display: inline;">Sign Out</button>
-        </form>
-      <%}%>
+        <div class="navbar-nav">
+          <div class="navbar-item nav-link" style="display: inline"><a style="color: inherit;"
+              href="/login"><b>Login</b></a></div>
+          <div class="navbar-item nav-link" style="display: inline"><a style="color: inherit;"
+              href="/register"><b>Register</b></a></div>
+        </div>
+        <%}%>
+          <%if (email) {%>
+            <form method="POST" action="/logout">
+              <div style="display: inline">Currently Logged In As: <%= email %>
+              </div>
+              <button style="display: inline;">Sign Out</button>
+            </form>
+            <%}%>
     </div>
   </nav>
 </header>

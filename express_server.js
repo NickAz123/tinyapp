@@ -25,17 +25,23 @@ const users = {
 
 //SERVER REQUESTS
 app.post('/urls', (req, res) => {
-  let newData = req.body;
+  const newData = req.body;
+  const userID = req.cookies.user_id;
+  const user = findNameByID(userID);
+
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = newData.longURL;
+  users[user].urls[shortURL] = newData.longURL;
 
   res.redirect(301, '/urls');
   res.end();
 });
 
 app.post('/urls/:shortURL/delete', (req, res) => {
-  let shortURL = req.params.shortURL;
-  delete urlDatabase[shortURL];
+  const shortURL = req.params.shortURL;
+  const userID = req.cookies.user_id;
+  const user = findNameByID(userID);
+
+  delete users[user].urls[shortURL];
   res.redirect(301, '/urls');
   res.end();
 });
@@ -113,9 +119,9 @@ app.get('/urls', (req, res) => {
 });
 
 app.get('/urls/new', (req, res) => {
-  ;
-  const currentUser = req.cookies.user_id;
-  res.render('urls_new', { username: currentUser });
+  const userID = req.cookies.user_id;
+  const dataVars = findUserByID(userID);
+  res.render('urls_new', dataVars);
 });
 
 app.get('/urls/:shortURL', (req, res) => {
@@ -130,6 +136,7 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
+//FUNCTIONS
 const generateRandomString = (length = 6) => {
   return Math.random().toString(20).substr(2, length);
 };
@@ -153,12 +160,19 @@ const findIDByName = (user, password) => {
     }
   }
   return false;
-}
+};
+
+const findNameByID = (id) => {
+  for (let name in users) {
+    if (users[name].id === id) {
+      return name;
+    }
+  }
+};
 
 const findUserByEmail = (email) => {
   for (let name in users) {
     if (users[name].email === email) {
-      console.log("found a match");
       return true;
     }
   }
