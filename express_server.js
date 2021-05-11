@@ -121,6 +121,7 @@ app.get('/urls', (req, res) => {
 app.get('/urls/new', (req, res) => {
   const userID = req.cookies.user_id;
   const dataVars = findUserByID(userID);
+
   res.render('urls_new', dataVars);
 });
 
