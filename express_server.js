@@ -48,6 +48,11 @@ app.post('/logout/:username', (req, res) => {
   res.end();
 });
 
+app.post('/register', (req, res) => {
+  res.redirect(301, `/urls`);
+  res.end();
+});
+
 //SERVER PAGES
 
 app.get('/', (req, res) => {

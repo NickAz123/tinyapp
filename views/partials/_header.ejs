@@ -13,9 +13,18 @@
     </div>
     <div>
       <%if (!username) {%>
-        <form method="POST" action="/login">
+        <form method="POST" action="/register">
+          <label for="loginform">Register Here: </label>
           <input type="text" name="username" placeholder="enter username">
-          <button>Sign In</button>
+          <input type="text" name="email" placeholder="enter email">
+          <input type="text" name="password" placeholder="enter password">
+          <button>Register</button>
+        </form>
+        <form style="display: inline; float: right; " method="POST" id="loginform" action="/login">
+          <label for="loginform">Already Registered? Sign in:</label>
+          <input type="text" name="username" placeholder="username">
+          <input type="password" name="password" placeholder="password">
+          <button>Sign In</button><br>
         </form>
       <%}%>
       <%if (username) {%>
