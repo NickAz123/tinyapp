@@ -11,27 +11,30 @@ app.use(cookieParser());
 app.set('view engine', 'ejs');
 
 const urlDatabase = {
-
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
+  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" },
+  biiahdw: {longURL: "https://www.google.com", userID: 'hdh3g4'},
+  hukj28: {longURL: "https://www.facebook.com", userID: 'hdh3g4'}
 };
 
 const users = {
   nick: {
     id: 'hdh3g4',
     email: 'nasd@gmail.com',
-    password: 'Crazymoving1',
-    urls: { 'bxiiahdw': 'www.google.com' }
+    password: 'Crazymoving1'
   }
 };
 
 //SERVER REQUESTS
 app.post('/urls', (req, res) => {
-  const newData = req.body;
+  const newData = req.body.longURL;
+  console.log(newData);
   const userID = req.cookies.user_id;
-  const user = findNameByID(userID);
+  // const user = findNameByID(userID);
 
   const shortURL = generateRandomString();
-  users[user].urls[shortURL] = newData.longURL;
-
+  // users[user].urls[shortURL] = newData.longURL;
+  urlDatabase[shortURL] = {longURL: newData, userID: userID};
   res.redirect(301, '/urls');
   res.end();
 });
@@ -39,16 +42,15 @@ app.post('/urls', (req, res) => {
 app.post('/urls/:shortURL/delete', (req, res) => {
   const shortURL = req.params.shortURL;
   const userID = req.cookies.user_id;
-  const user = findNameByID(userID);
 
-  delete users[user].urls[shortURL];
+  delete urlDatabase[shortURL];
   res.redirect(301, '/urls');
   res.end();
 });
 
 app.post('/urls/:shortURL/edit', (req, res) => {
   let shortURL = req.params.shortURL;
-  res.redirect(`/urls/${shortURL}`);
+  res.redirect(`/urls/${shortURL}/edit`);
   res.end();
 });
 
@@ -97,14 +99,14 @@ app.post('/register', (req, res) => {
 app.get('/login', (req, res) => {
   const currentUser = req.cookies.user_id;
   const userData = findUserByID(currentUser);
-  const variables = { id: userData.id, email: userData.email, password: userData.password, urls: userData.urls };
+  const variables = { id: userData.id, email: userData.email, password: userData.password };
   res.render(`urls_login`, variables);
 });
 
 app.get('/register', (req, res) => {
   const currentUser = req.cookies.user_id;
   const userData = findUserByID(currentUser);
-  const variables = { id: userData.id, email: userData.email, password: userData.password, urls: userData.urls };
+  const variables = { id: userData.id, email: userData.email, password: userData.password };
 
   res.render(`urls_register`, variables);
 });
@@ -123,17 +125,28 @@ app.get('/new', (req, res) => {
 app.get('/urls', (req, res) => {
   const currentUser = req.cookies.user_id;
   const userData = findUserByID(currentUser);
-  const variables = { id: userData.id, email: userData.email, password: userData.password, urls: userData.urls };
+  const userURLS = findURLS(currentUser);
+  const variables = { id: userData.id, email: userData.email, password: userData.password, urls: userURLS };
+  console.log(variables);
 
   res.render('urls_index', variables);
 });
 
-app.get('/urls/:shortURL', (req, res) => {
+app.get('/urls/:shortURL/edit', (req, res) => {
   const currentUser = req.cookies.user_id;
   const userData = findUserByID(currentUser);
-  const dataVars = { shortURL: req.params.shortURL, longURL: userData.urls[req.params.shortURL], username: currentUser, email: userData.email };
+  const shortURL = req.params.shortURL;
+  const dataVars = { shortURL: shortURL, longURL: urlDatabase[shortURL].longURL, username: currentUser, email: userData.email };
 
   res.render('urls_show', dataVars);
+});
+
+app.get('/urls/:shortURL', (req, res) => {
+  const shortURL = req.params.shortURL;
+  const longURL = urlDatabase[shortURL].longURL;
+  
+  res.redirect(longURL);
+  res.end();
 });
 
 app.listen(PORT, () => {
@@ -181,4 +194,14 @@ const findUserByEmail = (email) => {
     }
   }
   return false;
+}
+
+const findURLS = (id) => {
+  let urls = {}
+  for (let surls in urlDatabase) {
+    if (urlDatabase[surls].userID === id){
+      urls[surls] = {longURL: urlDatabase[surls].longURL}
+    }
+  }
+  return urls;
 }
