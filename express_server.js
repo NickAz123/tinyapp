@@ -98,7 +98,6 @@ app.get('/login', (req, res) => {
   const currentUser = req.cookies.user_id;
   const userData = findUserByID(currentUser);
   const variables = { id: userData.id, email: userData.email, password: userData.password, urls: userData.urls };
-
   res.render(`urls_login`, variables);
 });
 
@@ -110,19 +109,23 @@ app.get('/register', (req, res) => {
   res.render(`urls_register`, variables);
 });
 
+app.get('/new', (req, res) => {
+  const userID = req.cookies.user_id;
+  const dataVars = findUserByID(userID);
+  if (!userID) {
+    res.redirect('/login');
+    res.end();
+  } else {
+    res.render('urls_new', dataVars);
+  }
+});
+
 app.get('/urls', (req, res) => {
   const currentUser = req.cookies.user_id;
   const userData = findUserByID(currentUser);
   const variables = { id: userData.id, email: userData.email, password: userData.password, urls: userData.urls };
 
   res.render('urls_index', variables);
-});
-
-app.get('/urls/new', (req, res) => {
-  const userID = req.cookies.user_id;
-  const dataVars = findUserByID(userID);
-
-  res.render('urls_new', dataVars);
 });
 
 app.get('/urls/:shortURL', (req, res) => {
