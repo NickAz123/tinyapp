@@ -14,7 +14,12 @@ const urlDatabase = {
 };
 
 const users = {
-
+  nick: {
+    id: 'hdh3g4',
+    email: 'nasd@gmail.com',
+    password: 'Crazymoving1',
+    urls: { 'bxiiahdw': 'www.google.com'}
+  }
 };
 
 //SERVER REQUESTS
@@ -47,8 +52,8 @@ app.post('/login', (req, res) => {
   res.end();
 });
 
-app.post('/logout/:username', (req, res) => {
-  res.clearCookie('username');
+app.post('/logout', (req, res) => {
+  res.clearCookie('user_id');
   res.redirect(301, `/urls`);
   res.end();
 });
@@ -60,7 +65,7 @@ app.post('/register', (req, res) => {
   const id = generateRandomString();
   res.cookie('user_id', id);
 
-  users[user] = {id: id, email: email, password: password}
+  users[user] = {id: id, email: email, password: password, urls: {}}
   res.redirect(301, `/urls`);
   res.end();
 });
@@ -71,19 +76,19 @@ app.get('/', (req, res) => {
 });
 
 app.get('/urls', (req, res) => {
-  console.log(users);
-  const currentUser = req.cookies.username;
-  const dataVars = {username: currentUser, urls: urlDatabase};
-  res.render('urls_index', dataVars);
+  const currentUser = req.cookies.user_id;
+  const userData = findUserByID(currentUser);
+  const variables = {id: userData.id, email: userData.email, password: userData.password, urls: userData.urls}
+  res.render('urls_index', variables);
 });
 
 app.get('/urls/new', (req, res) => {;
-  const currentUser = req.cookies.username;
+  const currentUser = req.cookies.user_id;
   res.render('urls_new', {username: currentUser});
 });
 
 app.get('/urls/:shortURL', (req, res) => {
-  const currentUser = req.cookies.username;
+  const currentUser = req.cookies.user_id;
   const dataVars = {shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: currentUser};
   res.render('urls_show', dataVars);
 });
@@ -94,4 +99,14 @@ app.listen(PORT, () => {
 
 const generateRandomString = (length = 6) => {
   return Math.random().toString(20).substr(2, length);
+};
+
+const findUserByID = (currentID) => {
+  let empty = {};
+  for (let user in users) {
+    if (users[user].id === currentID){
+      return users[user];
+    }
+  }
+  return empty;
 };

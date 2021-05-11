@@ -12,7 +12,7 @@
       </div>
     </div>
     <div>
-      <%if (!username) {%>
+      <%if (!email) {%>
         <form method="POST" action="/register">
           <label for="loginform">Register Here: </label>
           <input type="text" name="username" placeholder="enter username">
@@ -27,9 +27,9 @@
           <button>Sign In</button><br>
         </form>
       <%}%>
-      <%if (username) {%>
-        <form method="POST" action="/logout/<%= username%>">
-          <div style="display: inline">Currently Logged In As: <%= username %></div>
+      <%if (email) {%>
+        <form method="POST" action="/logout">
+          <div style="display: inline">Currently Logged In As: <%= email %></div>
           <button style="display: inline;">Sign Out</button>
         </form>
       <%}%>
