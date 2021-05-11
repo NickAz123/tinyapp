@@ -10,6 +10,11 @@ app.use(cookieParser());
 app.set('view engine', 'ejs');
 
 const urlDatabase = {
+
+};
+
+const users = {
+
 };
 
 //SERVER REQUESTS
@@ -49,17 +54,24 @@ app.post('/logout/:username', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
+  const user = req.body.username;
+  const email = req.body.email;
+  const password = req.body.password;
+  const id = generateRandomString();
+  res.cookie('user_id', id);
+
+  users[user] = {id: id, email: email, password: password}
   res.redirect(301, `/urls`);
   res.end();
 });
 
 //SERVER PAGES
-
 app.get('/', (req, res) => {
   res.send('Hello!');
 });
 
 app.get('/urls', (req, res) => {
+  console.log(users);
   const currentUser = req.cookies.username;
   const dataVars = {username: currentUser, urls: urlDatabase};
   res.render('urls_index', dataVars);
