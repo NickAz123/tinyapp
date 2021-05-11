@@ -4,6 +4,7 @@ const app = express();
 const PORT = 8080;
 const cookieParser = require(`cookie-parser`);
 const bodyParser = require("body-parser");
+const e = require("express");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
@@ -50,14 +51,19 @@ app.post('/login', (req, res) => {
   const password = req.body.password;
   const id = findIDByName(user, password);
 
-  res.cookie('user_id', id);
-  res.redirect(301, `/urls`);
-  res.end();
+  if (!id) {
+    res.status(403);
+    res.end();
+  } else {
+    res.cookie('user_id', id);
+    res.redirect(301, `/urls`);
+    res.end();
+  };
 });
 
 app.post('/logout', (req, res) => {
   res.clearCookie('user_id');
-  res.redirect(301, `/urls`);
+  res.redirect(301, `/login`);
   res.end();
 });
 
@@ -66,7 +72,7 @@ app.post('/register', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const id = generateRandomString();
-  
+
   const alreadyUser = findUserByEmail(email);
 
   if (!email || !password || alreadyUser) {
@@ -82,8 +88,20 @@ app.post('/register', (req, res) => {
 });
 
 //SERVER PAGES
-app.get('/', (req, res) => {
-  res.send('Hello!');
+app.get('/login', (req, res) => {
+  const currentUser = req.cookies.user_id;
+  const userData = findUserByID(currentUser);
+  const variables = { id: userData.id, email: userData.email, password: userData.password, urls: userData.urls };
+
+  res.render(`urls_login`, variables);
+});
+
+app.get('/register', (req, res) => {
+  const currentUser = req.cookies.user_id;
+  const userData = findUserByID(currentUser);
+  const variables = { id: userData.id, email: userData.email, password: userData.password, urls: userData.urls };
+
+  res.render(`urls_register`, variables);
 });
 
 app.get('/urls', (req, res) => {
@@ -134,11 +152,11 @@ const findIDByName = (user, password) => {
       }
     }
   }
+  return false;
 }
 
 const findUserByEmail = (email) => {
   for (let name in users) {
-    console.log(name);
     if (users[name].email === email) {
       console.log("found a match");
       return true;
