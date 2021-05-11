@@ -4,7 +4,7 @@ const app = express();
 const PORT = 8080;
 const cookieParser = require(`cookie-parser`);
 const bodyParser = require("body-parser");
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.set('view engine', 'ejs');
@@ -18,7 +18,7 @@ const users = {
     id: 'hdh3g4',
     email: 'nasd@gmail.com',
     password: 'Crazymoving1',
-    urls: { 'bxiiahdw': 'www.google.com'}
+    urls: { 'bxiiahdw': 'www.google.com' }
   }
 };
 
@@ -66,11 +66,19 @@ app.post('/register', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const id = generateRandomString();
-  res.cookie('user_id', id);
+  
+  const alreadyUser = findUserByEmail(email);
 
-  users[user] = {id: id, email: email, password: password, urls: {}}
-  res.redirect(301, `/urls`);
-  res.end();
+  if (!email || !password || alreadyUser) {
+    res.status(400);
+    res.end();
+  } else {
+    res.cookie('user_id', id);
+
+    users[user] = { id: id, email: email, password: password, urls: {} }
+    res.redirect(301, `/urls`);
+    res.end();
+  }
 });
 
 //SERVER PAGES
@@ -81,18 +89,22 @@ app.get('/', (req, res) => {
 app.get('/urls', (req, res) => {
   const currentUser = req.cookies.user_id;
   const userData = findUserByID(currentUser);
-  const variables = {id: userData.id, email: userData.email, password: userData.password, urls: userData.urls}
+  const variables = { id: userData.id, email: userData.email, password: userData.password, urls: userData.urls };
+
   res.render('urls_index', variables);
 });
 
-app.get('/urls/new', (req, res) => {;
+app.get('/urls/new', (req, res) => {
+  ;
   const currentUser = req.cookies.user_id;
-  res.render('urls_new', {username: currentUser});
+  res.render('urls_new', { username: currentUser });
 });
 
 app.get('/urls/:shortURL', (req, res) => {
   const currentUser = req.cookies.user_id;
-  const dataVars = {shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: currentUser};
+  const userData = findUserByID(currentUser);
+  const dataVars = { shortURL: req.params.shortURL, longURL: userData.urls[req.params.shortURL], username: currentUser, email: userData.email };
+
   res.render('urls_show', dataVars);
 });
 
@@ -107,7 +119,7 @@ const generateRandomString = (length = 6) => {
 const findUserByID = (currentID) => {
   let empty = {};
   for (let user in users) {
-    if (users[user].id === currentID){
+    if (users[user].id === currentID) {
       return users[user];
     }
   }
@@ -122,4 +134,15 @@ const findIDByName = (user, password) => {
       }
     }
   }
+}
+
+const findUserByEmail = (email) => {
+  for (let name in users) {
+    console.log(name);
+    if (users[name].email === email) {
+      console.log("found a match");
+      return true;
+    }
+  }
+  return false;
 }
