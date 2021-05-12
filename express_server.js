@@ -109,15 +109,19 @@ app.get('/register', (req, res) => {
   res.render(`urls_register`, variables);
 });
 
-app.get('/new', (req, res) => {
+app.get('/newlink', (req, res) => {
+
   const userID = req.session.user_id;
   const dataVars = findUserByID(userID);
+  
   if (!userID) {
+    console.log("reach");
     res.redirect('/login');
     res.end();
   } else {
     res.render('urls_new', dataVars);
   }
+  res.end();
 });
 
 app.get('/urls', (req, res) => {
