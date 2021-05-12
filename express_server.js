@@ -4,7 +4,7 @@ const app = express();
 const PORT = 8080;
 const cookieParser = require(`cookie-parser`);
 const bodyParser = require("body-parser");
-const e = require("express");
+const bcrypt = require('bcrypt');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
@@ -13,17 +13,11 @@ app.set('view engine', 'ejs');
 const urlDatabase = {
   b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
   i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" },
-  biiahdw: {longURL: "https://www.google.com", userID: 'hdh3g4'},
-  hukj28: {longURL: "https://www.facebook.com", userID: 'hdh3g4'}
+  biiahdw: { longURL: "https://www.google.com", userID: 'hdh3g4' },
+  hukj28: { longURL: "https://www.facebook.com", userID: 'hdh3g4' }
 };
 
-const users = {
-  nick: {
-    id: 'hdh3g4',
-    email: 'nasd@gmail.com',
-    password: 'Crazymoving1'
-  }
-};
+const users = {};
 
 //SERVER REQUESTS
 app.post('/urls', (req, res) => {
@@ -34,7 +28,7 @@ app.post('/urls', (req, res) => {
 
   const shortURL = generateRandomString();
   // users[user].urls[shortURL] = newData.longURL;
-  urlDatabase[shortURL] = {longURL: newData, userID: userID};
+  urlDatabase[shortURL] = { longURL: newData, userID: userID };
   res.redirect(301, '/urls');
   res.end();
 });
@@ -57,7 +51,7 @@ app.post('/urls/:shortURL/edit', (req, res) => {
 app.post('/login', (req, res) => {
   const user = req.body.username;
   const password = req.body.password;
-  const id = findIDByName(user, password);
+  const id = findIDByLogin(user, password);
 
   if (!id) {
     res.status(403);
@@ -78,18 +72,19 @@ app.post('/logout', (req, res) => {
 app.post('/register', (req, res) => {
   const user = req.body.username;
   const email = req.body.email;
-  const password = req.body.password;
+  const hashPass = bcrypt.hashSync((req.body.password), 10);
   const id = generateRandomString();
 
   const alreadyUser = findUserByEmail(email);
 
-  if (!email || !password || alreadyUser) {
+  if (!email || !hashPass || alreadyUser) {
     res.status(400);
     res.end();
   } else {
     res.cookie('user_id', id);
 
-    users[user] = { id: id, email: email, password: password, urls: {} }
+    users[user] = { id: id, email: email, password: hashPass}
+    console.log(users);
     res.redirect(301, `/urls`);
     res.end();
   }
@@ -144,7 +139,7 @@ app.get('/urls/:shortURL/edit', (req, res) => {
 app.get('/urls/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL].longURL;
-  
+
   res.redirect(longURL);
   res.end();
 });
@@ -168,23 +163,16 @@ const findUserByID = (currentID) => {
   return empty;
 };
 
-const findIDByName = (user, password) => {
+const findIDByLogin = (user, password) => {
   for (let name in users) {
     if (name === user) {
-      if (users[name].password === password) {
+      const passCheck = bcrypt.compareSync(password, users[name].password);
+      if (passCheck) {
         return users[name].id;
       }
     }
   }
   return false;
-};
-
-const findNameByID = (id) => {
-  for (let name in users) {
-    if (users[name].id === id) {
-      return name;
-    }
-  }
 };
 
 const findUserByEmail = (email) => {
@@ -194,14 +182,14 @@ const findUserByEmail = (email) => {
     }
   }
   return false;
-}
+};
 
 const findURLS = (id) => {
   let urls = {}
   for (let surls in urlDatabase) {
-    if (urlDatabase[surls].userID === id){
-      urls[surls] = {longURL: urlDatabase[surls].longURL}
+    if (urlDatabase[surls].userID === id) {
+      urls[surls] = { longURL: urlDatabase[surls].longURL }
     }
   }
   return urls;
-}
+};
