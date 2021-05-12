@@ -2,7 +2,7 @@
 const express = require('express');
 const cookieSession = require('cookie-session');
 const app = express();
-const {findIDByLogin, findURLS, findUserByEmail, findUserByID} = require('./helpers');
+const {findIDByLogin, findURLS, findUserByEmail, findUserByID, generateRandomString} = require('./helpers');
 const PORT = 8080;
 // const cookieParser = require(`cookie-parser`);
 const bodyParser = require("body-parser");
@@ -153,49 +153,3 @@ app.get('/urls/:shortURL', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
-//FUNCTIONS
-const generateRandomString = (length = 6) => {
-  return Math.random().toString(20).substr(2, length);
-};
-
-// const findUserByID = (currentID) => {
-//   let empty = {};
-//   for (let user in users) {
-//     if (users[user].id === currentID) {
-//       return users[user];
-//     }
-//   }
-//   return empty;
-// };
-
-// const findIDByLogin = (user, password) => {
-//   for (let name in users) {
-//     if (name === user) {
-//       const passCheck = bcrypt.compareSync(password, users[name].password);
-//       if (passCheck) {
-//         return users[name].id;
-//       }
-//     }
-//   }
-//   return false;
-// };
-
-// const findUserByEmail = (email) => {
-//   for (let name in users) {
-//     if (users[name].email === email) {
-//       return true;
-//     }
-//   }
-//   return false;
-// };
-
-// const findURLS = (id) => {
-//   let urls = {}
-//   for (let surls in urlDatabase) {
-//     if (urlDatabase[surls].userID === id) {
-//       urls[surls] = { longURL: urlDatabase[surls].longURL }
-//     }
-//   }
-//   return urls;
-// };

@@ -39,4 +39,8 @@ const findURLS = (id, urlDatabase) => {
   return urls;
 };
 
-module.exports = {findIDByLogin, findURLS, findUserByEmail, findUserByID};
+const generateRandomString = (length = 6) => {
+  return Math.random().toString(20).substr(2, length);
+};
+
+module.exports = {findIDByLogin, findURLS, findUserByEmail, findUserByID, generateRandomString};
