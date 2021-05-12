@@ -46,6 +46,16 @@ app.post('/urls/:shortURL/edit', (req, res) => {
   res.end();
 });
 
+app.post('/:shortURL/updateURL', (req, res) => {
+  const shortURL = req.params.shortURL;
+  const newURL = req.body.newURL;
+  const currentID = req.session.user_id;
+
+  urlDatabase[shortURL] = { longURL: newURL, userID: currentID };
+  res.redirect(`/urls`);
+  res.end();
+});
+
 app.post('/login', (req, res) => {
   const user = req.body.username;
   const password = req.body.password;
