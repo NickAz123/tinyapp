@@ -1,12 +1,17 @@
 //SERVER DEPENDENCIES & VARIABLES
-const express = require("express");
+const express = require('express');
+const cookieSession = require('cookie-session');
 const app = express();
 const PORT = 8080;
 const cookieParser = require(`cookie-parser`);
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
+// app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: ['key1', 'key2']
+}));
 
 app.set('view engine', 'ejs');
 
@@ -22,8 +27,7 @@ const users = {};
 //SERVER REQUESTS
 app.post('/urls', (req, res) => {
   const newData = req.body.longURL;
-  console.log(newData);
-  const userID = req.cookies.user_id;
+  const userID = req.session.user_id;
   // const user = findNameByID(userID);
 
   const shortURL = generateRandomString();
@@ -57,14 +61,14 @@ app.post('/login', (req, res) => {
     res.status(403);
     res.end();
   } else {
-    res.cookie('user_id', id);
+    req.session.user_id = id;
     res.redirect(301, `/urls`);
     res.end();
   };
 });
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('user_id');
+  req.session = null;
   res.redirect(301, `/login`);
   res.end();
 });
@@ -81,10 +85,9 @@ app.post('/register', (req, res) => {
     res.status(400);
     res.end();
   } else {
-    res.cookie('user_id', id);
-
+    req.session.user_id = id;
+  
     users[user] = { id: id, email: email, password: hashPass}
-    console.log(users);
     res.redirect(301, `/urls`);
     res.end();
   }
@@ -92,14 +95,14 @@ app.post('/register', (req, res) => {
 
 //SERVER PAGES
 app.get('/login', (req, res) => {
-  const currentUser = req.cookies.user_id;
+  const currentUser = req.session.user_id;
   const userData = findUserByID(currentUser);
   const variables = { id: userData.id, email: userData.email, password: userData.password };
   res.render(`urls_login`, variables);
 });
 
 app.get('/register', (req, res) => {
-  const currentUser = req.cookies.user_id;
+  const currentUser = req.session.user_id;
   const userData = findUserByID(currentUser);
   const variables = { id: userData.id, email: userData.email, password: userData.password };
 
@@ -107,7 +110,7 @@ app.get('/register', (req, res) => {
 });
 
 app.get('/new', (req, res) => {
-  const userID = req.cookies.user_id;
+  const userID = req.session.user_id;
   const dataVars = findUserByID(userID);
   if (!userID) {
     res.redirect('/login');
@@ -118,17 +121,16 @@ app.get('/new', (req, res) => {
 });
 
 app.get('/urls', (req, res) => {
-  const currentUser = req.cookies.user_id;
+  const currentUser = req.session.user_id;
   const userData = findUserByID(currentUser);
   const userURLS = findURLS(currentUser);
   const variables = { id: userData.id, email: userData.email, password: userData.password, urls: userURLS };
-  console.log(variables);
 
   res.render('urls_index', variables);
 });
 
 app.get('/urls/:shortURL/edit', (req, res) => {
-  const currentUser = req.cookies.user_id;
+  const currentUser = req.session.user_id;
   const userData = findUserByID(currentUser);
   const shortURL = req.params.shortURL;
   const dataVars = { shortURL: shortURL, longURL: urlDatabase[shortURL].longURL, username: currentUser, email: userData.email };
