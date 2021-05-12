@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt');
+
 const findUserByID = (currentID, users) => {
   let empty = {};
   for (let user in users) {

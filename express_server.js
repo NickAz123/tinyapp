@@ -16,13 +16,7 @@ app.use(cookieSession({
 
 app.set('view engine', 'ejs');
 
-const urlDatabase = {
-  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
-  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" },
-  biiahdw: { longURL: "https://www.google.com", userID: 'hdh3g4' },
-  hukj28: { longURL: "https://www.facebook.com", userID: 'hdh3g4' }
-};
-
+const urlDatabase = {};
 const users = {};
 
 //SERVER REQUESTS
