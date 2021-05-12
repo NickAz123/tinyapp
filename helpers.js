@@ -32,10 +32,10 @@ const findUserByEmail = (email, users) => {
 };
 
 const findURLS = (id, urlDatabase) => {
-  let urls = {}
+  let urls = {};
   for (let surls in urlDatabase) {
     if (urlDatabase[surls].userID === id) {
-      urls[surls] = { longURL: urlDatabase[surls].longURL }
+      urls[surls] = { longURL: urlDatabase[surls].longURL, created: urlDatabase[surls].created};
     }
   }
   return urls;
@@ -45,4 +45,13 @@ const generateRandomString = (length = 6) => {
   return Math.random().toString(20).substr(2, length);
 };
 
-module.exports = {findIDByLogin, findURLS, findUserByEmail, findUserByID, generateRandomString};
+const currentDate = () => {
+  const date = new Date();
+  const day = date.getDate();
+  const month = date.getMonth();
+  const year = date.getFullYear();
+
+  return `${day}/${month}/${year}`
+}
+
+module.exports = {findIDByLogin, findURLS, findUserByEmail, findUserByID, generateRandomString, currentDate};

@@ -10,32 +10,7 @@
 </head>
 <body>
   <main style="margin: 1em;">
-    <h3>My URLs</h3>
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">Short URL</th>
-          <th scope="col">Long URL</th>
-          <th scope="col">Edit</th>
-          <th scope="col">Delete</th>
-          <th scope="col">Date Created</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% if (id) {%>
-          <% for(let url in urls) { %>
-            <tr>
-              <td><a href="/urls/<%=url%>"><%= url %></a></td>
-              <td><%= urls[url].longURL %></td>
-              <td><form method="POST" action="/urls/<%= url %>/edit"><button>Edit</button></form></td>
-              <td><form method="POST" action="/urls/<%= url %>/delete"><button>Delete</button></form></td>
-              <td><%= urls[url].created %></td>
-            </tr>
-          <% } %>
-        <% } %>
-      </tbody>
-    </table>
-  
+    <h3 style="align-self: center;">Error 403: Username or Password Invalid or Incorrect...</h3>
   </main>
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
