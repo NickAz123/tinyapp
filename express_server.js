@@ -2,7 +2,7 @@
 const express = require('express');
 const cookieSession = require('cookie-session');
 const app = express();
-// const {findIDByLogin, findURLS, findUserByEmail, findUserByID} = require('./helpers');
+const {findIDByLogin, findURLS, findUserByEmail, findUserByID} = require('./helpers');
 const PORT = 8080;
 // const cookieParser = require(`cookie-parser`);
 const bodyParser = require("body-parser");
@@ -55,7 +55,7 @@ app.post('/urls/:shortURL/edit', (req, res) => {
 app.post('/login', (req, res) => {
   const user = req.body.username;
   const password = req.body.password;
-  const id = findIDByLogin(user, password);
+  const id = findIDByLogin(user, password, users);
 
   if (!id) {
     res.status(403);
@@ -79,7 +79,7 @@ app.post('/register', (req, res) => {
   const hashPass = bcrypt.hashSync((req.body.password), 10);
   const id = generateRandomString();
 
-  const alreadyUser = findUserByEmail(email);
+  const alreadyUser = findUserByEmail(email, users);
 
   if (!email || !hashPass || alreadyUser) {
     res.status(400);
@@ -96,14 +96,14 @@ app.post('/register', (req, res) => {
 //SERVER PAGES
 app.get('/login', (req, res) => {
   const currentUser = req.session.user_id;
-  const userData = findUserByID(currentUser);
+  const userData = findUserByID(currentUser, users);
   const variables = { id: userData.id, email: userData.email, password: userData.password };
   res.render(`urls_login`, variables);
 });
 
 app.get('/register', (req, res) => {
   const currentUser = req.session.user_id;
-  const userData = findUserByID(currentUser);
+  const userData = findUserByID(currentUser, users);
   const variables = { id: userData.id, email: userData.email, password: userData.password };
 
   res.render(`urls_register`, variables);
@@ -112,7 +112,7 @@ app.get('/register', (req, res) => {
 app.get('/newlink', (req, res) => {
 
   const userID = req.session.user_id;
-  const dataVars = findUserByID(userID);
+  const dataVars = findUserByID(userID, users);
   
   if (!userID) {
     console.log("reach");
@@ -126,8 +126,8 @@ app.get('/newlink', (req, res) => {
 
 app.get('/urls', (req, res) => {
   const currentUser = req.session.user_id;
-  const userData = findUserByID(currentUser);
-  const userURLS = findURLS(currentUser);
+  const userData = findUserByID(currentUser, users);
+  const userURLS = findURLS(currentUser, urlDatabase);
   const variables = { id: userData.id, email: userData.email, password: userData.password, urls: userURLS };
 
   res.render('urls_index', variables);
@@ -135,7 +135,7 @@ app.get('/urls', (req, res) => {
 
 app.get('/urls/:shortURL/edit', (req, res) => {
   const currentUser = req.session.user_id;
-  const userData = findUserByID(currentUser);
+  const userData = findUserByID(currentUser, users);
   const shortURL = req.params.shortURL;
   const dataVars = { shortURL: shortURL, longURL: urlDatabase[shortURL].longURL, username: currentUser, email: userData.email };
 
@@ -159,43 +159,43 @@ const generateRandomString = (length = 6) => {
   return Math.random().toString(20).substr(2, length);
 };
 
-const findUserByID = (currentID) => {
-  let empty = {};
-  for (let user in users) {
-    if (users[user].id === currentID) {
-      return users[user];
-    }
-  }
-  return empty;
-};
+// const findUserByID = (currentID) => {
+//   let empty = {};
+//   for (let user in users) {
+//     if (users[user].id === currentID) {
+//       return users[user];
+//     }
+//   }
+//   return empty;
+// };
 
-const findIDByLogin = (user, password) => {
-  for (let name in users) {
-    if (name === user) {
-      const passCheck = bcrypt.compareSync(password, users[name].password);
-      if (passCheck) {
-        return users[name].id;
-      }
-    }
-  }
-  return false;
-};
+// const findIDByLogin = (user, password) => {
+//   for (let name in users) {
+//     if (name === user) {
+//       const passCheck = bcrypt.compareSync(password, users[name].password);
+//       if (passCheck) {
+//         return users[name].id;
+//       }
+//     }
+//   }
+//   return false;
+// };
 
-const findUserByEmail = (email) => {
-  for (let name in users) {
-    if (users[name].email === email) {
-      return true;
-    }
-  }
-  return false;
-};
+// const findUserByEmail = (email) => {
+//   for (let name in users) {
+//     if (users[name].email === email) {
+//       return true;
+//     }
+//   }
+//   return false;
+// };
 
-const findURLS = (id) => {
-  let urls = {}
-  for (let surls in urlDatabase) {
-    if (urlDatabase[surls].userID === id) {
-      urls[surls] = { longURL: urlDatabase[surls].longURL }
-    }
-  }
-  return urls;
-};
+// const findURLS = (id) => {
+//   let urls = {}
+//   for (let surls in urlDatabase) {
+//     if (urlDatabase[surls].userID === id) {
+//       urls[surls] = { longURL: urlDatabase[surls].longURL }
+//     }
+//   }
+//   return urls;
+// };

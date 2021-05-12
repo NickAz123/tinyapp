@@ -1,4 +1,4 @@
-const findUserByID = (currentID) => {
+const findUserByID = (currentID, users) => {
   let empty = {};
   for (let user in users) {
     if (users[user].id === currentID) {
@@ -8,7 +8,7 @@ const findUserByID = (currentID) => {
   return empty;
 };
 
-const findIDByLogin = (user, password) => {
+const findIDByLogin = (user, password, users) => {
   for (let name in users) {
     if (name === user) {
       const passCheck = bcrypt.compareSync(password, users[name].password);
@@ -20,7 +20,7 @@ const findIDByLogin = (user, password) => {
   return false;
 };
 
-const findUserByEmail = (email) => {
+const findUserByEmail = (email, users) => {
   for (let name in users) {
     if (users[name].email === email) {
       return true;
@@ -29,7 +29,7 @@ const findUserByEmail = (email) => {
   return false;
 };
 
-const findURLS = (id) => {
+const findURLS = (id, urlDatabase) => {
   let urls = {}
   for (let surls in urlDatabase) {
     if (urlDatabase[surls].userID === id) {
