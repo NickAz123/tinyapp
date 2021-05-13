@@ -1,10 +1,11 @@
 //SERVER DEPENDENCIES & VARIABLES
 const express = require('express');
 const cookieSession = require('cookie-session');
-const app = express();
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
+const methodOverride = require('method-override');
 const {findIDByLogin, findURLS, findUserByEmail, findUserByID, generateRandomString, currentDate} = require('./helpers');
+const app = express();
 
 const PORT = 8080;
 const urlDatabase = {};
@@ -12,6 +13,7 @@ const users = {};
 
 //MIDDLEWARE
 app.set('view engine', 'ejs');
+app.use(methodOverride('_method'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieSession({
   name: 'session',
@@ -24,7 +26,6 @@ app.post('/urls', (req, res) => {
   const userID = req.session.user_id;
   const shortURL = generateRandomString();
   const date = currentDate();
-  console.log(date);
 
   urlDatabase[shortURL] = { longURL: newData, userID: userID, created: date };
 
@@ -33,7 +34,7 @@ app.post('/urls', (req, res) => {
 });
 
 //url deletes
-app.post('/urls/:shortURL/delete', (req, res) => {
+app.delete('/urls/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
 
   delete urlDatabase[shortURL];
@@ -51,7 +52,7 @@ app.post('/urls/:shortURL/edit', (req, res) => {
 });
 
 //updating edited url
-app.post('/:shortURL/updateURL', (req, res) => {
+app.put('/:shortURL/updateURL', (req, res) => {
   const shortURL = req.params.shortURL;
   const newURL = req.body.newURL;
   const currentID = req.session.user_id;
@@ -71,21 +72,24 @@ app.post('/login', (req, res) => {
 
   if (!id) {
     res.statusMessage = 'Not found';
-    res.status(403).end();
+    res.status(403);
+    res.end();
   } else {
     req.session.user_id = id;
-    res.redirect(301, `/urls`).end();
+    res.redirect(301, `/urls`);
+    res.end();
   }
 });
 
 //logout requests
 app.post('/logout', (req, res) => {
   req.session = null;
-  res.redirect(301, `/login`).end();
+  res.redirect(301, `/login`);
+  res.end();
 });
 
 //registration requests
-app.post('/register', (req, res) => {
+app.put('/register', (req, res) => {
   const user = req.body.username;
   const email = req.body.email;
   const id = generateRandomString();
@@ -93,12 +97,14 @@ app.post('/register', (req, res) => {
   const alreadyUser = findUserByEmail(email, users);
 
   if (!email || !hashPass || alreadyUser) {
-    res.status(400).end();
+    res.status(400);
+    res.end();
   } else {
     req.session.user_id = id;
   
     users[user] = { id: id, email: email, password: hashPass};
-    res.redirect(301, `/urls`).end();
+    res.redirect(301, `/urls`);
+    res.end();
   }
 });
 
@@ -107,9 +113,11 @@ app.get('/', (req, res) => {
   const currentID = req.session.user_id;
 
   if (!currentID) {
-    res.redirect('/login').end();
+    res.redirect('/login');
+    res.end();
   } else {
-    res.redirect('/urls').end();
+    res.redirect('/urls');
+    res.end();
   }
 });
 
@@ -137,7 +145,8 @@ app.get('/newlink', (req, res) => {
   const dataVars = findUserByID(userID, users);
   
   if (!userID) {
-    res.redirect('/login').end();
+    res.redirect('/login');
+    res.end();
   } else {
     res.render('urls_new', dataVars);
   }
@@ -170,9 +179,11 @@ app.get('/urls/:shortURL', (req, res) => {
   const longURL = urlDatabase[shortURL].longURL;
 
   if (longURL) {
-    res.redirect(longURL).end;
+    res.redirect(longURL);
+    res.end();
   } else {
-    res.status(400).end();
+    res.status(400);
+    res.end();
   }
 });
 
