@@ -4,7 +4,7 @@ const cookieSession = require('cookie-session');
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
 const methodOverride = require('method-override');
-const {findIDByLogin, findURLS, findUserByEmail, findUserByID, generateRandomString, currentDate} = require('./helpers');
+const { findIDByLogin, findURLS, findUserByEmail, findUserByID, generateRandomString, currentDate } = require('./helpers');
 const app = express();
 
 const PORT = 8080;
@@ -26,6 +26,8 @@ app.post('/urls', (req, res) => {
   const userID = req.session.user_id;
   const shortURL = generateRandomString();
   const date = currentDate();
+  console.log(users);
+  console.log(urlDatabase);
 
   urlDatabase[shortURL] = { longURL: newData, userID: userID, created: date };
 
@@ -101,8 +103,8 @@ app.put('/register', (req, res) => {
     res.end();
   } else {
     req.session.user_id = id;
-  
-    users[user] = { id: id, email: email, password: hashPass};
+
+    users[user] = { id: id, email: email, password: hashPass };
     res.redirect(301, `/urls`);
     res.end();
   }
@@ -143,7 +145,7 @@ app.get('/register', (req, res) => {
 app.get('/newlink', (req, res) => {
   const userID = req.session.user_id;
   const dataVars = findUserByID(userID, users);
-  
+
   if (!userID) {
     res.redirect('/login');
     res.end();
@@ -166,11 +168,17 @@ app.get('/urls', (req, res) => {
 //url editing
 app.get('/urls/:shortURL/edit', (req, res) => {
   const currentUser = req.session.user_id;
-  const userData = findUserByID(currentUser, users);
   const shortURL = req.params.shortURL;
-  const dataVars = { shortURL: shortURL, longURL: urlDatabase[shortURL].longURL, email: userData.email };
 
-  res.render('urls_show', dataVars);
+  if (urlDatabase[shortURL].userID !== currentUser) {
+    res.status(401);
+    res.end();
+  } else {
+    const userData = findUserByID(currentUser, users);
+    const dataVars = { shortURL: shortURL, longURL: urlDatabase[shortURL].longURL, email: userData.email };
+  
+    res.render('urls_show', dataVars);
+  }
 });
 
 //redirection to long urls
