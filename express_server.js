@@ -149,10 +149,12 @@ app.get('/newlink', (req, res) => {
   if (!userID) {
     res.redirect('/login');
     res.end();
+    return;
   } else {
     res.render('urls_new', dataVars);
+    res.end();
+    return;
   }
-  res.end();
 });
 
 //home page
