@@ -175,6 +175,7 @@ app.get('/urls/:shortURL/edit', (req, res) => {
   if (urlDatabase[shortURL].userID !== currentUser) {
     res.status(401);
     res.end();
+    return;
   } else {
     const userData = findUserByID(currentUser, users);
     const dataVars = { shortURL: shortURL, longURL: urlDatabase[shortURL].longURL, email: userData.email };
